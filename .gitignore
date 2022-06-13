@@ -1,3 +1,5 @@
-output/coverage/report/*
+output/coverage/report/*.html
+output/coverage/report/*.lua
+output/coverage/report/*.xml
 luacov.report.out
 luacov.stats.out
