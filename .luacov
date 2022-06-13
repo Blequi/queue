@@ -1,0 +1,21 @@
+return {
+	-- standard luacov configuration keys and values here
+    runreport = true,
+    statsfile = 'luacov.stats.out',
+    reportfile = 'luacov.report.out',
+
+    reporter = "html",
+
+    html = {
+        outputDirectory = "output/coverage/report",
+        projectName = "queue"
+    },
+
+    include = {
+        "queue.lua"
+    },
+
+    modules = {
+        ["queue"] = "queue.lua"
+    }
+}
