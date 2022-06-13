@@ -7,26 +7,21 @@ environment:
   - LUA: "lua 5.1"
   - LUA: "lua 5.2"
   - LUA: "lua 5.3"
+  - LUA: "lua 5.4"
+  - LUA: "luajit 2.0"
   - LUA: "luajit 2.1"
 
-configuration:
-  - mingw
-  - vs_32
-  - vs_64
-
 install:
-  - set PATH=%CD%\env\bin;C:\Python27\Scripts;C:\MinGW\bin;%PATH%
+  - set PATH=C:\Python27\Scripts;%PATH%
   - pip install hererocks
-  - hererocks env --%LUA% --target %configuration% --luarocks latest
+  - hererocks env --%LUA% -rlatest
+  - call env\bin\activate
 
 build: Script
 
 build_script:
 - lua -v
 - luarocks --version
-
-after_build:
-- lua -e "print(require('queue') == nil)"
 
 before_test:
 - luarocks install busted
@@ -39,3 +34,5 @@ test_script:
 
 after_test:
 - luarocks make queue-0.0.1-0.rockspec
+- rm .\queue.lua
+- lua -e "print(require('queue') == nil and 'Unable to use queue module' or 'queue rock installed')"
