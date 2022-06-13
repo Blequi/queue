@@ -34,7 +34,6 @@ test_script:
 
 after_test:
 - luarocks make queue-0.0.1-0.rockspec
-- rm .\queue.lua
 - lua -e "print(require('queue') == nil and 'Unable to use queue module' or 'queue rock installed')"
 
 on_success:

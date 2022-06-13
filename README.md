@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/v276ccgrm8uy380u?svg=true)](https://ci.appveyor.com/project/Blequi/queue)
 
-[![Coverage Status](https://coveralls.io/repos/github/Blequi/queue/badge.svg?branch=appveyor)](https://coveralls.io/github/Blequi/queue?branch=appveyor)
+[![Coverage Status](https://coveralls.io/repos/github/Blequi/queue/badge.svg)](https://coveralls.io/github/Blequi/queue)
 
 ## Table of Contents
 
