@@ -1,5 +1,9 @@
 # queue
 
+[![Build status](https://ci.appveyor.com/api/projects/status/v276ccgrm8uy380u?svg=true)](https://ci.appveyor.com/project/Blequi/queue)
+
+[![Coverage Status](https://coveralls.io/repos/github/Blequi/queue/badge.svg?branch=appveyor)](https://coveralls.io/github/Blequi/queue?branch=appveyor)
+
 ## Table of Contents
 
 * [Summary](#summary)
@@ -264,7 +268,7 @@ lua test.lua
 
 ## Code Coverage
 
-Since *queue* is a tiny library, one primary goal is the achievement of high code coverage running unit tests. Currently, *queue* version 0.0.1-0 achieves 100% code coverage.
+Since *queue* is a tiny library, one primary goal is the achievement of high code coverage running unit tests.
 
 In order to run the code coverage on tests, you need ```busted``` library and also the following development dependencies:
 
