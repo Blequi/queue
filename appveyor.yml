@@ -19,12 +19,19 @@ install:
   - pip install hererocks
   - hererocks env --%LUA% --target %configuration% --luarocks latest
 
-build: off
+build: Script
+
+build_script:
+- lua -v
+- luarocks --version
+
+after_build:
+- lua -e "print(require('queue') == nil)"
 
 before_test:
 - luarocks install busted
 - luarocks install luacov
-- luarocks install luacov-html
+- luarocks install luacov-multiple
 
 test_script:
 - echo "Starting unit tests:"

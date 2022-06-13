@@ -272,12 +272,12 @@ In order to run the code coverage on tests, you need ```busted``` library and al
 ```
 luarocks install luacov
 ```
-* ```luacov-html```
+* ```luacov-multiple```
 ```
-luarocks install luacov-html
+luarocks install luacov-multiple
 ```
 
-After ```luacov``` and ```luacov-html``` installation, open a terminal (or command prompt) in the **queue** directory and run:
+After ```luacov``` and ```luacov-multiple``` installation, open a terminal (or command prompt) in the **queue** directory and run:
 
 ```
 lua -lluacov test.lua
