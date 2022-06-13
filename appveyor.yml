@@ -19,6 +19,8 @@ install:
   - pip install hererocks
   - hererocks env --%LUA% --target %configuration% --luarocks latest
 
+build: off
+
 before_test:
 - luarocks install busted
 - luarocks install luacov
