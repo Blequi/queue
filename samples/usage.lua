@@ -14,7 +14,7 @@ q:enqueue(function() print("hello world") end)
 print(q.count)
 
 -- iterating elements
-for pos, value in q:iterate() do
+for pos, value in q:iterator() do
     -- pos holds the element's position in the queue
     -- value holds the element's value
     print(pos, value)
