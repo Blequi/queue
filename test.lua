@@ -21,6 +21,11 @@ describe("queue initialization", function()
         local q = Queue()
         assert.are.equals(0, q.count)
     end)
+
+    it("should start with # as zero", function()
+        local q = Queue()
+        assert.are.equals(0, #q)
+    end)
 end)
 
 describe("queue fields", function()
@@ -56,7 +61,7 @@ describe("clear method", function()
         assert.are.equals(0, q.count)
     end)
 
-    it("should not have any elements to iterate", function()
+    it("should have length zero on queues with arbitrary number of elements", function()
         local q = Queue()
 
         local n = math.random(5, 10)
@@ -67,7 +72,25 @@ describe("clear method", function()
 
         q:clear()
 
+        assert.are.equals(0, #q)
+    end)
+
+    it("should not have any elements to iterate", function()
+        local q = Queue()
+
+        local n = math.random(5, 10)
+
+        for i = 1, n do
+            q:enqueue(math.random())
+        end
+
+        q:clear()
         for pos, v in q:iterate() do
+            assert.True(false)
+        end
+
+        q:clear()
+        for pos, v in q:iterator() do
             assert.True(false)
         end
     end)
@@ -84,9 +107,11 @@ describe("dequeue method", function()
         local q = Queue()
         q:enqueue(math.random())
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
 
         local deq = q:dequeue()
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
     end)
 
     it("should decrement count from n to n - 1", function()
@@ -99,10 +124,12 @@ describe("dequeue method", function()
         end
 
         assert.are.equals(n, q.count)
+        assert.are.equals(n, #q)
 
         q:dequeue()
 
         assert.are.equals(n - 1, q.count)
+        assert.are.equals(n - 1, #q)
     end)
 
     it("should return the first enqueued element on empty fresh queues", function()
@@ -111,6 +138,7 @@ describe("dequeue method", function()
         local first = math.random()
         q:enqueue(first)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
 
         local n = math.random(5, 10)
 
@@ -127,10 +155,12 @@ describe("dequeue method", function()
         local first = math.random()
         q:enqueue(first)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
 
         local second = math.random()
         q:enqueue(second)
         assert.are.equals(2, q.count)
+        assert.are.equals(2, #q)
 
         local n = math.random(5, 10)
 
@@ -162,6 +192,7 @@ describe("iterate method", function()
         q:enqueue(math.random())
 
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
 
         local n = q.count
 
@@ -189,6 +220,7 @@ describe("iterate method", function()
             end
 
             assert.are.equals(n, q.count)
+            assert.are.equals(n, #q)
 
             local k = 0
             for pos, v in q:iterate() do
@@ -221,8 +253,98 @@ describe("iterate method", function()
             end
 
             assert.are.equals(n, q.count)
+            assert.are.equals(n, #q)
 
             for pos, v in q:iterate() do
+                assert.are.equals(t[pos], v)
+            end
+        end
+    end)
+end)
+
+describe("iterator method", function()
+    it("should not iterate any element on fresh empty queues", function()
+        local q = Queue()
+
+        assert.True(q:empty())
+
+        for pos, v in q:iterator() do
+            assert.True(false)
+        end
+    end)
+
+    it("should iterate once on queues holding a single element", function()
+        local q = Queue()
+
+        assert.True(q:empty())
+
+        q:enqueue(math.random())
+
+        assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
+
+        local n = q.count
+
+        local i = 0
+        for pos, v in q:iterator() do
+            if (i > 0) then
+                assert.True(false)
+            end
+
+            i = i + 1
+        end
+    end)
+
+    it("should iterate at most n times on queues holding n element", function()
+        local q = Queue()
+
+        for j = 1, 10 do
+
+            q:clear()
+
+            local n = j
+
+            for i = 1, n do
+                q:enqueue(math.random())
+            end
+
+            assert.are.equals(n, q.count)
+            assert.are.equals(n, #q)
+
+            local k = 0
+            for pos, v in q:iterator() do
+                if (k > n) then
+                    assert.True(false)
+                end
+
+                k = k + 1
+            end
+        end
+
+    end)
+
+    it("should iterate exactly as a table on queues holding n element", function()
+        local q = Queue()
+
+        for j = 1, 10 do
+
+            q:clear()
+
+            local n = j
+
+            local t = {}
+
+            for i = 1, n do
+                local e = math.random()
+
+                table.insert(t, e)
+                q:enqueue(e)
+            end
+
+            assert.are.equals(n, q.count)
+            assert.are.equals(n, #q)
+
+            for pos, v in q:iterator() do
                 assert.are.equals(t[pos], v)
             end
         end
@@ -243,6 +365,7 @@ describe("empty method", function()
             q:clear()
 
             assert.are.equals(0, q.count)
+            assert.are.equals(0, #q)
 
             local n = j
 
@@ -260,6 +383,7 @@ describe("empty method", function()
         q:enqueue(math.random())
 
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
         assert.False(q:empty())
 
         q:dequeue()
@@ -274,6 +398,7 @@ describe("empty method", function()
             q:clear()
 
             assert.are.equals(0, q.count)
+            assert.are.equals(0, #q)
 
             local n = j
 
@@ -298,6 +423,7 @@ describe("empty method", function()
             q:clear()
 
             assert.are.equals(0, q.count)
+            assert.are.equals(0, #q)
 
             local n = j
 
@@ -319,6 +445,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(math.random())
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one on empty cleared queues", function()
@@ -332,9 +459,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(math.random())
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 on queues with n number of elements", function()
@@ -346,6 +475,7 @@ describe("enqueue method", function()
             q:enqueue(math.random())
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -353,6 +483,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(math.random(1, 100))
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding integer on empty cleared queues", function()
@@ -366,9 +497,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(math.random(1, 100))
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding integer on queues with n number of elements", function()
@@ -380,6 +513,7 @@ describe("enqueue method", function()
             q:enqueue(math.random(1, 100))
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -387,6 +521,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(nil)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding nil on empty cleared queues", function()
@@ -400,9 +535,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(nil)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding nil on queues with n number of elements", function()
@@ -414,6 +551,7 @@ describe("enqueue method", function()
             q:enqueue(nil)
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -421,6 +559,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(function() end)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding function on empty cleared queues", function()
@@ -434,9 +573,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(function() end)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding function on queues with n number of elements", function()
@@ -448,6 +589,7 @@ describe("enqueue method", function()
             q:enqueue(function() end)
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -455,6 +597,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(tostring(math.random()))
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding random string on empty cleared queues", function()
@@ -468,9 +611,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(tostring(math.random()))
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding random string on queues with n number of elements", function()
@@ -482,6 +627,7 @@ describe("enqueue method", function()
             q:enqueue(tostring(math.random()))
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -489,6 +635,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(false)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding false on empty cleared queues", function()
@@ -502,9 +649,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(false)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding false on queues with n number of elements", function()
@@ -516,6 +665,7 @@ describe("enqueue method", function()
             q:enqueue(false)
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -523,6 +673,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue(true)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding true on empty cleared queues", function()
@@ -536,9 +687,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue(true)
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding true on queues with n number of elements", function()
@@ -550,6 +703,7 @@ describe("enqueue method", function()
             q:enqueue(true)
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 
@@ -557,6 +711,7 @@ describe("enqueue method", function()
         local q = Queue()
         q:enqueue({})
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from zero to one adding table on empty cleared queues", function()
@@ -570,9 +725,11 @@ describe("enqueue method", function()
         q:clear()
 
         assert.are.equals(0, q.count)
+        assert.are.equals(0, #q)
 
         q:enqueue({})
         assert.are.equals(1, q.count)
+        assert.are.equals(1, #q)
     end)
 
     it("should increment count from n to n + 1 adding table on queues with n number of elements", function()
@@ -584,6 +741,7 @@ describe("enqueue method", function()
             q:enqueue({})
 
             assert.are.equals(i, q.count)
+            assert.are.equals(i, #q)
         end
     end)
 end)
@@ -602,6 +760,7 @@ describe("peek method", function()
             q:clear()
 
             assert.are.equals(0, q.count)
+            assert.are.equals(0, #q)
 
             local n = j
 
@@ -612,6 +771,7 @@ describe("peek method", function()
             local p = q:peek()
 
             assert.are.equals(n, q.count)
+            assert.are.equals(n, #q)
         end
     end)
 
@@ -622,6 +782,7 @@ describe("peek method", function()
             q:clear()
 
             assert.are.equals(0, q.count)
+            assert.are.equals(0, #q)
 
             local n = j
 
@@ -630,6 +791,7 @@ describe("peek method", function()
             q:enqueue(first)
 
             assert.are.equals(1, q.count)
+            assert.are.equals(1, #q)
 
             for i = 1, n - 1 do
                 q:enqueue(math.random())
@@ -638,6 +800,7 @@ describe("peek method", function()
             local p = q:peek()
 
             assert.are.equals(n, q.count)
+            assert.are.equals(n, #q)
 
             assert.are.equals(first, p)
         end
