@@ -1,4 +1,30 @@
-local function iterate(self)
+-- The MIT License (MIT)
+--
+-- Copyright (c) 2022 - 2026 Blequi https://github.com/Blequi/queue
+--
+-- Permission is hereby granted, free of charge,
+-- to any person obtaining a copy of this software
+-- and associated documentation files (the "Software"),
+-- to deal in the Software without restriction, including without
+-- limitation the rights to use, copy, modify, merge, publish,
+-- distribute, sublicense, and/or sell copies of the Software,
+-- and to permit persons to whom the Software is furnished to do so,
+-- subject to the following conditions:
+--
+-- The above copyright notice and this permission notice
+-- shall be included in all copies or substantial portions
+-- of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+-- EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+-- OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+-- IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+-- FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+-- ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+-- DEALINGS IN THE SOFTWARE.
+
+local function iterator(self)
     local node = self.first
     local position = 0
 
@@ -82,7 +108,8 @@ local function create()
         dequeue = function(self) return dequeue(data) end,
         empty = function(self) return empty(data) end,
         enqueue = function(self, value) enqueue(data, value) end,
-        iterate = function(self) return iterate(data) end,
+        iterate = function(self) return iterator(data) end,
+        iterator = function(self) return iterator(data) end,
         peek = function(self) return peek(data) end
     }
 
@@ -92,7 +119,8 @@ local function create()
             __newindex = function(self, key, value)
                 error("This object is read-only")
             end,
-            __metatable = false
+            __metatable = false,
+            __len = function(self) return data.count end
         }
     )
 end
