@@ -200,6 +200,7 @@ jobs:
 
       - name: Run samples (Windows)
         if: runner.os == 'Windows'
+        shell: cmd
         run: |
           for %%f in (samples\*.lua) do (
             echo Running sample "%%f"
