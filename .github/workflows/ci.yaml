@@ -51,6 +51,10 @@ jobs:
           repository: Blequi/LuaCMake
           path: LuaCMake
 
+      - name: Setup MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: step-security/msvc-dev-cmd@v1.13.1
+
       - name: Configure Lua (Windows)
         if: runner.os == 'Windows'
         shell: cmd
@@ -173,7 +177,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           cd luarocks-${LUAROCKS_VERSION}
-          configure --prefix=${RUNNER_TEMP}/root --with-lua=${RUNNER_TEMP}/root
+          ./configure --prefix=${RUNNER_TEMP}/root --with-lua=${RUNNER_TEMP}/root
 
       - name: Make LuaRocks (Unix)
         if: runner.os != 'Windows'
