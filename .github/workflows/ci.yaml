@@ -165,7 +165,7 @@ jobs:
           )
 
           for /F "tokens=* usebackq" %%f in (`luarocks path --lr-cpath`) do (
-            echo LUA_CPATH=.\?.lua;%%f;;>>%GITHUB_ENV%
+            echo LUA_CPATH=.\?.dll;%%f;;>>%GITHUB_ENV%
           )
 
           if %ERRORLEVEL% neq 0 (
@@ -190,6 +190,13 @@ jobs:
         run: |
           cd luarocks-${LUAROCKS_VERSION}
           make install
+
+      - name: Post-install LuaRocks configuration (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          echo "$(luarocks path --lr-bin)" >> ${GITHUB_PATH}
+          echo "LUA_PATH=./?.lua;$(luarocks path --lr-path);;" >> ${GITHUB_ENV}
+          echo "LUA_CPATH=./?.so;$(luarocks path --lr-cpath);;" >> ${GITHUB_ENV}
 
       - name: Install test dependencies (busted)
         run: luarocks install busted
