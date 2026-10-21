@@ -1,7 +1,5 @@
 # queue
 
-[![Build status](https://ci.appveyor.com/api/projects/status/v276ccgrm8uy380u?svg=true)](https://ci.appveyor.com/project/Blequi/queue)
-
 [![Coverage Status](https://coveralls.io/repos/github/Blequi/queue/badge.svg)](https://coveralls.io/github/Blequi/queue)
 
 ## Table of Contents
@@ -18,7 +16,10 @@
     * [empty](#empty)
     * [enqueue](#enqueue)
     * [iterate](#iterate)
+    * [iterator](#iterator)
     * [peek](#peek)
+* [Metamethods](#metamethods)
+    * [__len](#__len)
 * [Unit Tests](#unit-tests)
 * [Code Coverage](#code-coverage)
 
@@ -35,11 +36,12 @@ Even though there are common possibilities to implement a queue, this module emp
 ## Installation
 
 *  If luarocks is available on your operating system, just issue the command:
-```
-[sudo] luarocks install queue
-```
 
-* Simply drop the *queue.lua* file on your project path and ```require("queue")``` it.
+    ```
+    luarocks install queue
+    ```
+
+* Simply drop the *queue.lua* file on your project path and `require("queue")` it.
 
 ## Usage
 
@@ -60,7 +62,7 @@ q:enqueue(function() print("hello world") end)
 print(q.count)
 
 -- iterating elements
-for pos, value in q:iterate() do
+for pos, value in q:iterator() do
     -- pos holds the element's position in the queue
     -- value holds the element's value
     print(pos, value)
@@ -78,9 +80,10 @@ local v4 = q:dequeue() -- `function() print("hello world") end` will be removed
 ### count
 
 * *Description*: the number of elements in the queue
-* *Signature*: ```count```
+* *Signature*: `count`
     * *return (integer)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -104,9 +107,10 @@ print(q.count) -- 2 will show up
 ### clear
 
 * *Description*: removes all the elements from the queue
-* *Signature*: ```clear()```
+* *Signature*: `clear()`
     * *return (void)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -118,20 +122,21 @@ local q = queue()
 q:enqueue(10)
 q:enqueue("dog")
 
-print(q.count) -- 2 will be printed
+print(#q) -- 2 will be printed
 
 -- clearing the queue
 q:clear()
 
-print(q.count) -- 0 will be printed
+print(#q) -- 0 will be printed
 ```
 
 ### dequeue
 
 * *Description*: pops the first element from the queue
-* *Signature*: ```dequeue()```
+* *Signature*: `dequeue()`
     * *return (object)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -153,9 +158,10 @@ print(v2) -- print "dog"
 ### empty
 
 * *Description*: verifies the absence of elements in the queue
-* *Signature*: ```empty()```
+* *Signature*: `empty()`
     * *return (boolean)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -175,10 +181,11 @@ print(q:empty()) -- prints false
 ### enqueue
 
 * *Description*: pushes an element into the queue
-* *Signature*: ```enqueue(value)```
+* *Signature*: `enqueue(value)`
     * *value*: element to push into the queue
     * *return (void)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -190,15 +197,20 @@ local q = queue()
 q:enqueue(10)
 q:enqueue("dog")
 
-print(q.count) -- 2 will be printed
+print(#q) -- 2 will be printed
 ```
 
 ### iterate
 
+> [!TIP]
+>
+> This method has been deprecated. Use [iterator](#iterator) instead.
+
 * *Description*: iterates the queue
-* *Signature*: ```iterate()```
+* *Signature*: `iterate()`
     * *return (function)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -218,12 +230,39 @@ for pos, value in q:iterate() do
 end
 ```
 
+### iterator
+
+* *Description*: iterates the queue
+* *Signature*: `iterator()`
+    * *return (function)*
+* *Example*:
+
+```lua
+-- loading the module
+local queue = require("queue")
+
+-- creating a queue instance
+local q = queue()
+
+-- adding elements to it
+q:enqueue(10)
+q:enqueue("dog")
+
+-- iterating elements
+for pos, value in q:iterator() do
+    -- pos holds the element's position in the queue
+    -- value holds the element's value
+    print(pos, value)
+end
+```
+
 ### peek
 
 * *Description*: peeks an element from the first position in the queue, but does not remove it
-* *Signature*: ```peek()```
+* *Signature*: `peek()`
     * *return (object)*
 * *Example*:
+
 ```lua
 -- loading the module
 local queue = require("queue")
@@ -234,35 +273,63 @@ local q = queue()
 -- adding elements to it
 q:enqueue(10)
 
-print(q.count) -- prints 1
+print(#q) -- prints 1
 
 local v1 = q:peek() -- v1 holds 10
 
-print(q.count) -- peek does not remove elements, so 1 is still printed
+print(#q) -- peek does not remove elements, so 1 is still printed
 print(v1) -- prints 10
 
 -- adding more elements
 q:enqueue("dog")
 
-print(q.count) -- prints 2
+print(#q) -- prints 2
 
 local v2 = q:peek() -- v2 still holds 10, because elements were not removed
 
-print(q.count) -- peek does not remove elements, so 2 is still printed
+print(#q) -- peek does not remove elements, so 2 is still printed
 print(v2) -- prints 10
+```
+
+## Metamethods
+
+### __len
+
+* *Description*: Returns the number of elements in the queue
+* *Signature*: `#q`
+    * *return (integer)*
+* *Example*:
+
+
+```lua
+-- loading the module
+local queue = require("queue")
+
+-- creating a queue instance
+local q = queue()
+
+-- adding elements to it
+q:enqueue(10)
+
+print(#q) -- 1 will show up
+
+-- adding elements to it
+q:enqueue("dog")
+
+print(#q) -- 2 will show up
 ```
 
 ## Unit Tests
 
-In order to run the unit tests, you need the following development dependencies:
+In order to run the unit tests, you need [busted](https://github.com/lunarmodules/busted) (a test library). To install `busted`, run
 
-* ```busted```
-```
+```bash
 luarocks install busted
 ```
 
 After ```busted``` installation, open a terminal (or command prompt) in the **queue** directory and run:
-```
+
+```bash
 lua test.lua
 ```
 
@@ -270,21 +337,22 @@ lua test.lua
 
 Since *queue* is a tiny library, one primary goal is the achievement of high code coverage running unit tests.
 
-In order to run the code coverage on tests, you need ```busted``` library and also the following development dependencies:
+In order to run the code coverage on tests, you need ```busted``` library and also `luacov`. To install `luacov`, run
 
-* ```luacov```
-```
+```bash
 luarocks install luacov
 ```
-* ```luacov-multiple```
-```
-luarocks install luacov-multiple
-```
 
-After ```luacov``` and ```luacov-multiple``` installation, open a terminal (or command prompt) in the **queue** directory and run:
+1. After `luacov` installation, open a terminal (or command prompt) in the **queue** directory and run the following command to generate code coverage statistics (`luacov.stats.out`)
 
-```
-lua -lluacov test.lua
-```
+    ```bash
+    lua -lluacov test.lua
+    ```
 
-Once the program finished, navigate to directory ```output > coverage > report``` and open ```index.html``` file on your browser to analyze the code coverage report.
+2. Once the statistics file was created, run `luacov` to generate the final report (`luacov.reports.out`):
+
+    ```bash
+    luacov
+    ```
+
+3. Open the report (`luacov.reports.out`) on your preferred text editor.
