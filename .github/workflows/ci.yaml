@@ -39,10 +39,15 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v7
-
-      - uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
+          persist-credentials: false
+
+      - name: Checkout build system for Lua
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
           repository: Blequi/LuaCMake
           path: LuaCMake
 
@@ -194,3 +199,10 @@ jobs:
 
       - name: Run LuaCov
         run: luacov
+
+      - name: Upload code coverage to coveralls.io
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          files: luacov.report.out
+          format: luacov
