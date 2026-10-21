@@ -119,8 +119,7 @@ local function create()
             __newindex = function(self, key, value)
                 error("This object is read-only")
             end,
-            __metatable = false,
-            __len = function(self) return data.count end
+            __metatable = false
         }
     )
 end

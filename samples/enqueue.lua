@@ -8,4 +8,4 @@ local q = queue()
 q:enqueue(10)
 q:enqueue("dog")
 
-print(#q) -- 2 will be printed
+print(q.count) -- 2 will be printed

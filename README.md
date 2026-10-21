@@ -18,8 +18,6 @@
     * [iterate](#iterate)
     * [iterator](#iterator)
     * [peek](#peek)
-* [Metamethods](#metamethods)
-    * [__len](#__len)
 * [Unit Tests](#unit-tests)
 * [Code Coverage](#code-coverage)
 
@@ -122,12 +120,12 @@ local q = queue()
 q:enqueue(10)
 q:enqueue("dog")
 
-print(#q) -- 2 will be printed
+print(q.count) -- 2 will be printed
 
 -- clearing the queue
 q:clear()
 
-print(#q) -- 0 will be printed
+print(q.count) -- 0 will be printed
 ```
 
 ### dequeue
@@ -197,7 +195,7 @@ local q = queue()
 q:enqueue(10)
 q:enqueue("dog")
 
-print(#q) -- 2 will be printed
+print(q.count) -- 2 will be printed
 ```
 
 ### iterate
@@ -273,50 +271,22 @@ local q = queue()
 -- adding elements to it
 q:enqueue(10)
 
-print(#q) -- prints 1
+print(q.count) -- prints 1
 
 local v1 = q:peek() -- v1 holds 10
 
-print(#q) -- peek does not remove elements, so 1 is still printed
+print(q.count) -- peek does not remove elements, so 1 is still printed
 print(v1) -- prints 10
 
 -- adding more elements
 q:enqueue("dog")
 
-print(#q) -- prints 2
+print(q.count) -- prints 2
 
 local v2 = q:peek() -- v2 still holds 10, because elements were not removed
 
-print(#q) -- peek does not remove elements, so 2 is still printed
+print(q.count) -- peek does not remove elements, so 2 is still printed
 print(v2) -- prints 10
-```
-
-## Metamethods
-
-### __len
-
-* *Description*: Returns the number of elements in the queue
-* *Signature*: `#q`
-    * *return (integer)*
-* *Example*:
-
-
-```lua
--- loading the module
-local queue = require("queue")
-
--- creating a queue instance
-local q = queue()
-
--- adding elements to it
-q:enqueue(10)
-
-print(#q) -- 1 will show up
-
--- adding elements to it
-q:enqueue("dog")
-
-print(#q) -- 2 will show up
 ```
 
 ## Unit Tests
