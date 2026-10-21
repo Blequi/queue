@@ -92,7 +92,6 @@ jobs:
 
       - name: Add Lua to PATH environment variable (Unix)
         if: runner.os != 'Windows'
-        shell: cmd
         run: |
           echo ${RUNNER_TEMP}/root/bin>>${GITHUB_PATH}
 
@@ -127,7 +126,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          for /F "tokens=* usebackq" %%f in (`lua -e "print(_VERSION:sub(5)"`) do (
+          for /F "tokens=* usebackq" %%f in (`lua -e "print(_VERSION:sub(5))"`) do (
             luarocks config lua_version "%%f"
           )
 
