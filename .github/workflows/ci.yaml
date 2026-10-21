@@ -1,0 +1,196 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "*"
+    tags-ignore:
+      - "*"
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+
+permissions: read-all
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        lua-version:
+          - 5.1.5
+          - 5.2.4
+          - 5.3.6
+          - 5.4.9
+          - 5.5.1
+
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    env:
+      LUAROCKS_VERSION: 3.13.0
+
+    steps:
+
+      - uses: actions/checkout@v7
+
+      - uses: actions/checkout@v7
+        with:
+          repository: Blequi/LuaCMake
+          path: LuaCMake
+
+      - name: Configure Lua (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        env:
+          LUA_VERSION: ${{ matrix.lua-version }}
+        run: |
+          cmake ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DDOWNLOAD_LUA_SOURCES=ON ^
+            -DLUA_VERSION=%LUA_VERSION% ^
+            --install-prefix %RUNNER_TEMP%\root ^
+            -S LuaCMake ^
+            -B build
+
+      - name: Configure Lua (Unix)
+        if: runner.os != 'Windows'
+        env:
+          LUA_VERSION: ${{ matrix.lua-version }}
+        run: |
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DDOWNLOAD_LUA_SOURCES=ON \
+            -DLUA_VERSION=${LUA_VERSION} \
+            --install-prefix ${RUNNER_TEMP}/root \
+            -S LuaCMake \
+            -B build
+
+      - name: Build Lua
+        run: cmake --build build --config Release
+
+      - name: Install Lua
+        run: cmake --install build --config Release
+
+      - name: Add Lua to PATH environment variable (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo %RUNNER_TEMP%\root\bin>>%GITHUB_PATH%
+
+      - name: Add Lua to PATH environment variable (Unix)
+        if: runner.os != 'Windows'
+        shell: cmd
+        run: |
+          echo ${RUNNER_TEMP}/root/bin>>${GITHUB_PATH}
+
+      - name: Download LuaRocks (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: curl -LO "https://luarocks.github.io/luarocks/releases/luarocks-%LUAROCKS_VERSION%-windows-64.zip"
+
+      - name: Download LuaRocks (Unix)
+        if: runner.os != 'Windows'
+        run: curl -LO "https://luarocks.github.io/luarocks/releases/luarocks-${LUAROCKS_VERSION}.tar.gz"
+
+      - name: Extract LuaRocks (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: tar -xf "luarocks-%LUAROCKS_VERSION%-windows-64.zip"
+
+      - name: Extract LuaRocks (Unix)
+        if: runner.os != 'Windows'
+        run: tar -xf "luarocks-${LUAROCKS_VERSION}.tar.gz"
+
+      - name: Install LuaRocks (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          for %%f in (luarocks-%LUAROCKS_VERSION%-windows-64\*.exe) do (
+            echo Copying %%f to "%RUNNER_TEMP%\root\bin"
+            copy %%f "%RUNNER_TEMP%\root\bin"
+          )
+
+      - name: Post-install LuaRocks configuration (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          for /F "tokens=* usebackq" %%f in (`lua -e "print(_VERSION:sub(5)"`) do (
+            luarocks config lua_version "%%f"
+          )
+
+          if %ERRORLEVEL% neq 0 (
+            echo Failed to config Lua version for LuaRocks
+            exit /B 1
+          )
+
+          luarocks config lua_dir %RUNNER_TEMP%\root
+
+          if %ERRORLEVEL% neq 0 (
+            echo Failed to config Lua directory for LuaRocks
+            exit /B 1
+          )
+
+          for /F "tokens=* usebackq" %%f in (`luarocks path --lr-bin`) do (
+            echo %%f>>%GITHUB_PATH%
+          )
+
+          if %ERRORLEVEL% neq 0 (
+            echo Failed to set PATH environment variable
+            exit /B 1
+          )
+
+          for /F "tokens=* usebackq" %%f in (`luarocks path --lr-path`) do (
+            echo LUA_PATH=.\?.lua;%%f;;>>%GITHUB_ENV%
+          )
+
+          if %ERRORLEVEL% neq 0 (
+            echo Failed to set LUA_PATH environment variable
+            exit /B 1
+          )
+
+          for /F "tokens=* usebackq" %%f in (`luarocks path --lr-cpath`) do (
+            echo LUA_CPATH=.\?.lua;%%f;;>>%GITHUB_ENV%
+          )
+
+          if %ERRORLEVEL% neq 0 (
+            echo Failed to set LUA_CPATH environment variable
+            exit /B 1
+          )
+
+      - name: Configure LuaRocks (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd luarocks-${LUAROCKS_VERSION}
+          configure --prefix=${RUNNER_TEMP}/root --with-lua=${RUNNER_TEMP}/root
+
+      - name: Make LuaRocks (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd luarocks-${LUAROCKS_VERSION}
+          make
+
+      - name: Install LuaRocks (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd luarocks-${LUAROCKS_VERSION}
+          make install
+
+      - name: Install test dependencies (busted)
+        run: luarocks install busted
+
+      - name: Install test dependencies (luacov)
+        run: luarocks install luacov
+
+      - name: Run tests collecting code coverage
+        run: lua -lluacov test.lua
+
+      - name: Run LuaCov
+        run: luacov
