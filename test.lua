@@ -34,8 +34,31 @@ describe("queue fields", function()
 
         assert.False(pcall(function() q[any_field] = 2 end))
         assert.False(pcall(function() q.count = 2 end))
+        assert.False(pcall(function() q.version = 2 end))
         assert.False(pcall(function() q.first = 2 end))
         assert.False(pcall(function() q.last = 2 end))
+    end)
+end)
+
+describe("count field", function()
+    it("should be an integer", function()
+        local q = Queue()
+
+        assert.are.equals("number", type(q.count))
+        assert.True(math.floor(q.count) == q.count)
+
+        q:enqueue(4)
+
+        assert.are.equals("number", type(q.count))
+        assert.True(math.floor(q.count) == q.count and q.count > 0)
+    end)
+end)
+
+describe("version field", function()
+    it("should be a string", function()
+        local q = Queue()
+
+        assert.are.equals("string", type(q.version))
     end)
 end)
 

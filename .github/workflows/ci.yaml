@@ -198,6 +198,32 @@ jobs:
           echo "LUA_PATH=./?.lua;$(luarocks path --lr-path);;" >> ${GITHUB_ENV}
           echo "LUA_CPATH=./?.so;$(luarocks path --lr-cpath);;" >> ${GITHUB_ENV}
 
+      - name: Run samples (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          for %%f in (samples\*.lua) do (
+            echo Running sample "%%f"
+
+            lua %%f
+
+            if %ERRORLEVEL% neq 0 (
+              echo Failed to run sample "%%f"
+              exit /B 1
+            )
+          )
+
+      - name: Run samples (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          for f in samples/*.lua; do
+            echo -e "Running sample: $(tput setaf 6)${f}$(tput sgr0)";
+
+            lua $f || {
+              echo "Failed to run sample: $f";
+              exit 1;
+            }
+          done
+
       - name: Install test dependencies (busted)
         run: luarocks install busted
 

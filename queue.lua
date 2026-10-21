@@ -24,6 +24,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 -- DEALINGS IN THE SOFTWARE.
 
+local version = "0.0.2"
+
 local function iterator(self)
     local node = self.first
     local position = 0
@@ -100,6 +102,7 @@ local function create()
     data = {
         -- properties
         count = 0,
+        version = version,
         first = nil,
         last = nil,
 

@@ -10,6 +10,7 @@
 * [Usage](#usage)
 * [Properties](#properties)
     * [count](#count)
+    * [version](#version)
 * [Methods](#methods)
     * [clear](#clear)
     * [dequeue](#dequeue)
@@ -82,23 +83,41 @@ local v4 = q:dequeue() -- `function() print("hello world") end` will be removed
     * *return (integer)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
+    -- adding elements to it
+    q:enqueue(10)
 
-print(q.count) -- 1 will show up
+    print(q.count) -- 1 will show up
 
--- adding elements to it
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue("dog")
 
-print(q.count) -- 2 will show up
-```
+    print(q.count) -- 2 will show up
+    ```
+
+### version
+
+* *Description*: the version of this library
+* *Signature*: `version`
+    * *return (string)*
+* *Example*:
+
+    ```lua
+    -- loading the module
+    local queue = require("queue")
+
+    -- creating a queue instance
+    local q = queue()
+
+    -- print the library version
+    print(q.version)
+    ```
 
 ## Methods
 
@@ -109,24 +128,24 @@ print(q.count) -- 2 will show up
     * *return (void)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue(10)
+    q:enqueue("dog")
 
-print(q.count) -- 2 will be printed
+    print(q.count) -- 2 will be printed
 
--- clearing the queue
-q:clear()
+    -- clearing the queue
+    q:clear()
 
-print(q.count) -- 0 will be printed
-```
+    print(q.count) -- 0 will be printed
+    ```
 
 ### dequeue
 
@@ -135,23 +154,23 @@ print(q.count) -- 0 will be printed
     * *return (object)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue(10)
+    q:enqueue("dog")
 
-local v1 = q:dequeue() -- remove 10 from the queue and store on v1 variable
-local v2 = q:dequeue() -- remove "dog" from the queue and store on v2 variable
+    local v1 = q:dequeue() -- remove 10 from the queue and store on v1 variable
+    local v2 = q:dequeue() -- remove "dog" from the queue and store on v2 variable
 
-print(v1) -- print 10
-print(v2) -- print "dog"
-```
+    print(v1) -- print 10
+    print(v2) -- print "dog"
+    ```
 
 ### empty
 
@@ -160,21 +179,21 @@ print(v2) -- print "dog"
     * *return (boolean)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
-print(q:empty()) -- prints true
+    print(q:empty()) -- prints true
 
--- adding elements to it
-q:enqueue(10)
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue(10)
+    q:enqueue("dog")
 
-print(q:empty()) -- prints false
-```
+    print(q:empty()) -- prints false
+    ```
 
 ### enqueue
 
@@ -184,19 +203,19 @@ print(q:empty()) -- prints false
     * *return (void)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue(10)
+    q:enqueue("dog")
 
-print(q.count) -- 2 will be printed
-```
+    print(q.count) -- 2 will be printed
+    ```
 
 ### iterate
 
@@ -209,24 +228,24 @@ print(q.count) -- 2 will be printed
     * *return (function)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue(10)
+    q:enqueue("dog")
 
--- iterating elements
-for pos, value in q:iterate() do
-    -- pos holds the element's position in the queue
-    -- value holds the element's value
-    print(pos, value)
-end
-```
+    -- iterating elements
+    for pos, value in q:iterate() do
+        -- pos holds the element's position in the queue
+        -- value holds the element's value
+        print(pos, value)
+    end
+    ```
 
 ### iterator
 
@@ -235,24 +254,24 @@ end
     * *return (function)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
-q:enqueue("dog")
+    -- adding elements to it
+    q:enqueue(10)
+    q:enqueue("dog")
 
--- iterating elements
-for pos, value in q:iterator() do
-    -- pos holds the element's position in the queue
-    -- value holds the element's value
-    print(pos, value)
-end
-```
+    -- iterating elements
+    for pos, value in q:iterator() do
+        -- pos holds the element's position in the queue
+        -- value holds the element's value
+        print(pos, value)
+    end
+    ```
 
 ### peek
 
@@ -261,33 +280,33 @@ end
     * *return (object)*
 * *Example*:
 
-```lua
--- loading the module
-local queue = require("queue")
+    ```lua
+    -- loading the module
+    local queue = require("queue")
 
--- creating a queue instance
-local q = queue()
+    -- creating a queue instance
+    local q = queue()
 
--- adding elements to it
-q:enqueue(10)
+    -- adding elements to it
+    q:enqueue(10)
 
-print(q.count) -- prints 1
+    print(q.count) -- prints 1
 
-local v1 = q:peek() -- v1 holds 10
+    local v1 = q:peek() -- v1 holds 10
 
-print(q.count) -- peek does not remove elements, so 1 is still printed
-print(v1) -- prints 10
+    print(q.count) -- peek does not remove elements, so 1 is still printed
+    print(v1) -- prints 10
 
--- adding more elements
-q:enqueue("dog")
+    -- adding more elements
+    q:enqueue("dog")
 
-print(q.count) -- prints 2
+    print(q.count) -- prints 2
 
-local v2 = q:peek() -- v2 still holds 10, because elements were not removed
+    local v2 = q:peek() -- v2 still holds 10, because elements were not removed
 
-print(q.count) -- peek does not remove elements, so 2 is still printed
-print(v2) -- prints 10
-```
+    print(q.count) -- peek does not remove elements, so 2 is still printed
+    print(v2) -- prints 10
+    ```
 
 ## Unit Tests
 
