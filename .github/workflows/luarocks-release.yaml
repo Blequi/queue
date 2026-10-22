@@ -1,11 +1,12 @@
 name: LuaRocks Release
 
 on:
-  release:
-    types:
-      - published
-
-permissions: read-all
+  workflow_dispatch:
+    inputs:
+      rockspec:
+        description: The path to the rockspec to upload (e.g. rockspec/queue-0.0.2-0.rockspec)
+        type: string
+        required: true
 
 jobs:
   rockspec:
@@ -18,14 +19,16 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
 
       - name: Get rockspec path
         id: rockspec
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          REQUESTED_ROCKSPEC: ${{ inputs.rockspec }}
         run: |
-          version="${TAG#v}"
-          rockspec=$(git ls-files "rockspecs/queue-${version}-*.rockspec" | sort --version-sort | tail -n1)
+          version="${GITHUB_REF_NAME##v}"
+          rockspec=$(git ls-files "${REQUESTED_ROCKSPEC}" | sort --version-sort | tail -n1)
           if test -f "${rockspec}"; then
             echo "rockspec=${rockspec}" >> ${GITHUB_OUTPUT}
           else
@@ -37,7 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - rockspec
-    if: github.repository == 'Blequi/queue' && needs.rockspec.outputs.rockspec != 'error'
+    if: |
+      github.repository == 'Blequi/queue' &&
+      github.ref_type == 'tag' &&
+      needs.rockspec.outputs.rockspec != 'error'
 
     env:
       LUAROCKS_VERSION: 3.13.0
@@ -46,11 +52,12 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
 
       - name: Checkout build system for Lua
         uses: actions/checkout@v7
         with:
-          persist-credentials: false
           repository: Blequi/LuaCMake
           path: LuaCMake
 
