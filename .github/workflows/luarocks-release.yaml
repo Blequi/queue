@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       rockspec:
-        description: The path to the rockspec to upload (e.g. rockspec/queue-0.0.2-0.rockspec)
+        description: The path to the rockspec to upload (e.g. rockspecs/queue-0.0.2-0.rockspec)
         type: string
         required: true
 
