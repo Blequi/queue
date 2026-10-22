@@ -1,0 +1,123 @@
+name: LuaRocks Release
+
+on:
+  release:
+    types:
+      - published
+
+permissions: read-all
+
+jobs:
+  rockspec:
+    name: Get the rockspec for the release
+    runs-on: ubuntu-latest
+    outputs:
+      rockspec: ${{ steps.rockspec.outputs.rockspec }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Get rockspec path
+        id: rockspec
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="${TAG#v}"
+          rockspec=$(git ls-files "rockspecs/queue-${version}-*.rockspec" | sort --version-sort | tail -n1)
+          if test -f "${rockspec}"; then
+            echo "rockspec=${rockspec}" >> ${GITHUB_OUTPUT}
+          else
+            echo "rockspec=error" >> ${GITHUB_OUTPUT}
+          fi
+
+  luarocks-release:
+    name: Release to GitHub
+    runs-on: ubuntu-latest
+    needs:
+      - rockspec
+    if: github.repository == 'Blequi/queue' && needs.rockspec.outputs.rockspec != 'error'
+
+    env:
+      LUAROCKS_VERSION: 3.13.0
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Checkout build system for Lua
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          repository: Blequi/LuaCMake
+          path: ../LuaCMake
+
+      - name: Install system dependencies for Lua
+        run: sudo apt install -y libreadline-dev
+
+      - name: Configure Lua
+        env:
+          LUA_VERSION: 5.5.1
+        run: |
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DDOWNLOAD_LUA_SOURCES=ON \
+            -DLUA_VERSION=${LUA_VERSION} \
+            --install-prefix ${RUNNER_TEMP}/root \
+            -S ../LuaCMake \
+            -B build
+
+      - name: Build Lua
+        run: cmake --build build --config Release
+
+      - name: Install Lua
+        run: cmake --install build --config Release
+
+      - name: Add Lua to PATH environment variable
+        run: |
+          echo ${RUNNER_TEMP}/root/bin>>${GITHUB_PATH}
+
+      - name: Extract LuaRocks
+        run: tar -xf "luarocks-${LUAROCKS_VERSION}.tar.gz"
+
+      - name: Configure LuaRocks
+        run: |
+          cd luarocks-${LUAROCKS_VERSION}
+          ./configure --prefix=${RUNNER_TEMP}/root --with-lua=${RUNNER_TEMP}/root
+
+      - name: Make LuaRocks
+        run: |
+          cd luarocks-${LUAROCKS_VERSION}
+          make
+
+      - name: Install LuaRocks
+        run: |
+          cd luarocks-${LUAROCKS_VERSION}
+          make install
+
+      - name: Post-install LuaRocks configuration
+        run: |
+          echo "$(luarocks path --lr-bin)" >> ${GITHUB_PATH}
+          echo "LUA_PATH=./?.lua;$(luarocks path --lr-path);;" >> ${GITHUB_ENV}
+          echo "LUA_CPATH=./?.so;$(luarocks path --lr-cpath);;" >> ${GITHUB_ENV}
+
+      - name: Install system dependencies to upload (OpenSSL)
+        run: sudo apt install -y libssl-dev
+
+      - name: Install upload dependencies (dkjson)
+        run: luarocks install dkjson
+
+      - name: Install upload dependencies (luasocket)
+        run: luarocks install luasocket
+
+      - name: Install upload dependencies (luasec)
+        run: luarocks install luasec
+
+      - name: Upload to LuaRocks
+        env:
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+          ROCKSPEC: ${{ needs.rockspec.outputs.rockspec }}
+        run: |
+          luarocks upload ${ROCKSPEC} --temp-key=${LUAROCKS_API_KEY}
