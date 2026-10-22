@@ -86,6 +86,9 @@ jobs:
         run: |
           echo ${RUNNER_TEMP}/root/bin>>${GITHUB_PATH}
 
+      - name: Download LuaRocks
+        run: curl -LO "https://luarocks.github.io/luarocks/releases/luarocks-${LUAROCKS_VERSION}.tar.gz"
+
       - name: Extract LuaRocks
         run: tar -xf "luarocks-${LUAROCKS_VERSION}.tar.gz"
 
