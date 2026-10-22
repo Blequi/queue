@@ -36,7 +36,7 @@ jobs:
     permissions: read-all
     runs-on: ubuntu-latest
     outputs:
-      new: ${{ steps.new.outputs.new }}
+      exists: ${{ steps.exists.outputs.exists }}
 
     steps:
 
@@ -47,14 +47,14 @@ jobs:
           persist-credentials: false
 
       - name: Check the existence of a previous release for the tag
-        id: new
+        id: exists
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
-            echo "new=false" >> ${GITHUB_OUTPUT}
+            echo "exists=true" >> ${GITHUB_OUTPUT}
           else
-            echo "new=true" >> ${GITHUB_OUTPUT}
+            echo "exists=false" >> ${GITHUB_OUTPUT}
           fi
 
   github-release:
@@ -67,7 +67,7 @@ jobs:
     if: |
       github.repository == 'Blequi/queue' &&
       needs.tag-version.outputs.version != 'error' &&
-      needs.check-release.outputs.new != 'true'
+      needs.check-release.outputs.exists != 'true'
     runs-on: ubuntu-latest
 
     env:
