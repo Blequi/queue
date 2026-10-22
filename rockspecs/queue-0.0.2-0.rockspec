@@ -1,8 +1,8 @@
 package = "queue"
 version = "0.0.2-0"
 source = {
-   url = "git+https://github.com/Blequi/queue.git",
-   tag = "v0.0.2"
+   url = "https://github.com/Blequi/queue/releases/download/v0.0.2/queue-0.0.2.zip",
+   dir = "queue-0.0.2"
 }
 description = {
    summary = "Queue data structure written in pure Lua",
