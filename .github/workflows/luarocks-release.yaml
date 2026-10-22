@@ -52,7 +52,7 @@ jobs:
         with:
           persist-credentials: false
           repository: Blequi/LuaCMake
-          path: ../LuaCMake
+          path: LuaCMake
 
       - name: Install system dependencies for Lua
         run: sudo apt install -y libreadline-dev
@@ -66,7 +66,7 @@ jobs:
             -DDOWNLOAD_LUA_SOURCES=ON \
             -DLUA_VERSION=${LUA_VERSION} \
             --install-prefix ${RUNNER_TEMP}/root \
-            -S ../LuaCMake \
+            -S LuaCMake \
             -B build
 
       - name: Build Lua
