@@ -1,0 +1,98 @@
+name: GitHub Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  tag-version:
+    name: Parse version from tag
+    permissions: read-all
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+          persist-credentials: false
+
+      - name: Get version
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME##v}"
+          if [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "version=${version}" >> ${GITHUB_OUTPUT}
+          else
+            echo "version=error" >> ${GITHUB_OUTPUT}
+          fi
+
+  check-release:
+    name: Check whether it is a new release or not
+    permissions: read-all
+    runs-on: ubuntu-latest
+    outputs:
+      new: ${{ steps.new.outputs.new }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+          persist-credentials: false
+
+      - name: Check the existence of a previous release for the tag
+        id: new
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            echo "new=false" >> ${GITHUB_OUTPUT}
+          else
+            echo "new=true" >> ${GITHUB_OUTPUT}
+          fi
+
+  github-release:
+    name: Publish to GitHub
+    permissions:
+      contents: write
+    needs:
+      - tag-version
+      - check-release
+    if: |
+      github.repository == 'Blequi/queue' &&
+      needs.tag-version.outputs.version != 'error' &&
+      needs.check-release.outputs.new != 'true'
+    runs-on: ubuntu-latest
+
+    env:
+      VERSION: ${{ needs.tag-version.outputs.version }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Generate a zip from the tag
+        run: |
+          git archive --format=zip -o queue-${VERSION}.zip --prefix=queue-${VERSION}/ "${GITHUB_REF}"
+
+      - name: Generate a tarball from the tag
+        run: |
+          git archive --format=tar.gz -o queue-${VERSION}.tar.gz --prefix=queue-${VERSION}/ "${GITHUB_REF}"
+
+      - name: Create a GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            queue-${VERSION}.zip \
+            queue-${VERSION}.tar.gz
