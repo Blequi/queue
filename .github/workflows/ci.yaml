@@ -53,7 +53,7 @@ jobs:
 
       - name: Install system dependencies for Lua (Linux)
         if: runner.os == 'Linux'
-        uses: sudo apt install -y libreadline-dev
+        run: sudo apt install -y libreadline-dev
 
       - name: Setup MSVC (Windows)
         if: runner.os == 'Windows'
